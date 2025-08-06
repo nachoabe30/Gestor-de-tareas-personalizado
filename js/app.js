@@ -24,9 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Variable global para almacenar la card que se está editando o viendo
     let currentTaskCard = null;
-    
-    // Contador para el número de tareas
-    let taskCounter = 0;
 
     // Array para almacenar los datos de las tareas
     let tasks = [];
@@ -41,23 +38,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const storedTasks = JSON.parse(localStorage.getItem('tasks'));
         if (storedTasks) {
             tasks = storedTasks;
-            taskCounter = tasks.length;
-            tasks.forEach(task => createTaskCard(task.title, task.description, task.creationTime, task.status));
+            tasks.forEach((task, index) => createTaskCard(task.title, task.description, task.creationTime, task.status, index));
         }
     }
 
     // Función para crear una nueva tarea (card) en el DOM
-    function createTaskCard(title, description, creationTime, status = 'not-started') {
+    function createTaskCard(title, description, creationTime, status = 'not-started', index) {
         const cardCol = document.createElement('div');
         cardCol.className = 'col-sm-12 col-md-6 col-lg-4 mb-3';
-
-        const taskIndex = tasks.findIndex(t => t.title === title && t.description === description && t.creationTime === creationTime);
-        cardCol.setAttribute('data-task-index', taskIndex);
+        cardCol.setAttribute('data-task-index', index);
 
         cardCol.innerHTML = `
             <div class="card border-0 rounded-3 shadow status-${status}" data-status="${status}">
                 <div class="card-body bg-white rounded-3 position-relative">
-                    <span class="badge bg-dark position-absolute top-0 start-0 m-2">#${taskIndex + 1}</span>
+                    <span class="badge bg-dark position-absolute top-0 start-0 m-2">#${index + 1}</span>
                     <small class="text-muted position-absolute bottom-0 end-0 m-2">${creationTime}</small>
                     
                     <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 delete-btn">
@@ -82,6 +76,19 @@ document.addEventListener('DOMContentLoaded', () => {
         taskList.prepend(cardCol);
     }
     
+    // Función para actualizar los números de las tarjetas
+    function updateCardNumbers() {
+        const cards = document.querySelectorAll('#taskList .col-sm-12');
+        cards.forEach((card, index) => {
+            card.setAttribute('data-task-index', index);
+            const cardBody = card.querySelector('.card-body');
+            const badge = cardBody.querySelector('.badge');
+            if (badge) {
+                badge.textContent = `#${index + 1}`;
+            }
+        });
+    }
+
     // Escuchar el evento 'click' del botón de guardar tarea nueva
     saveTaskBtn.addEventListener('click', () => {
         const title = taskTitleInput.value;
@@ -102,9 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
             status: 'not-started'
         };
 
-        tasks.push(newTask);
+        tasks.unshift(newTask); // Usar unshift para agregar al principio
         saveTasksToLocalStorage();
-        createTaskCard(title, description, creationTime);
+        
+        // Limpiar el DOM y volver a renderizar para actualizar los índices
+        taskList.innerHTML = '';
+        tasks.forEach((task, index) => createTaskCard(task.title, task.description, task.creationTime, task.status, index));
         
         taskForm.reset();
         
@@ -144,6 +154,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardStatus = currentTaskCard.getAttribute('data-status') || 'not-started';
             updateStatusButtons(cardStatus);
         }
+
+        // LÓGICA DE BORRADO
+        if (target.closest('.delete-btn')) {
+            const cardCol = target.closest('.col-sm-12');
+            const taskIndex = parseInt(cardCol.getAttribute('data-task-index'));
+            
+            // Eliminar la tarea del array y del DOM
+            if (!isNaN(taskIndex)) {
+                tasks.splice(taskIndex, 1);
+                saveTasksToLocalStorage();
+                cardCol.remove();
+                updateCardNumbers();
+            }
+        }
     });
 
     // Manejar el clic en los botones de estado dentro del modal
@@ -161,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
         statusButtonsContainer.querySelectorAll('button').forEach(btn => {
             btn.classList.remove('active', 'btn-danger', 'btn-warning', 'btn-success');
             
-            // Reaplicar la clase de outline a todos los botones
             if (btn.getAttribute('data-status') === 'not-started') {
                 btn.classList.add('btn-outline-danger');
             } else if (btn.getAttribute('data-status') === 'in-progress') {
@@ -184,9 +207,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedButton = statusButtonsContainer.querySelector('.active');
             const newStatus = selectedButton ? selectedButton.getAttribute('data-status') : 'not-started';
 
-            const taskIndex = currentTaskCard.parentElement.getAttribute('data-task-index');
-            tasks[taskIndex].status = newStatus;
-            saveTasksToLocalStorage();
+            const taskIndex = parseInt(currentTaskCard.parentElement.getAttribute('data-task-index'));
+            if (!isNaN(taskIndex) && tasks[taskIndex]) {
+                tasks[taskIndex].status = newStatus;
+                saveTasksToLocalStorage();
+            }
 
             currentTaskCard.classList.remove('status-not-started', 'status-in-progress', 'status-completed');
             currentTaskCard.classList.add(`status-${newStatus}`);
@@ -203,10 +228,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const newTitle = editTaskTitleInput.value;
             const newDescription = editTaskDescriptionInput.value;
             
-            const taskIndex = currentTaskCard.parentElement.getAttribute('data-task-index');
-            tasks[taskIndex].title = newTitle;
-            tasks[taskIndex].description = newDescription;
-            saveTasksToLocalStorage();
+            const taskIndex = parseInt(currentTaskCard.parentElement.getAttribute('data-task-index'));
+            if (!isNaN(taskIndex) && tasks[taskIndex]) {
+                tasks[taskIndex].title = newTitle;
+                tasks[taskIndex].description = newDescription;
+                saveTasksToLocalStorage();
+            }
 
             currentTaskCard.querySelector('.card-title').textContent = newTitle;
             currentTaskCard.querySelector('.card-text').textContent = newDescription;
