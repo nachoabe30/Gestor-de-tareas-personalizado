@@ -1,0 +1,12 @@
+/* Colores de estado de la tarjeta */
+.card.status-not-started {
+    border-left: 5px solid red;
+}
+
+.card.status-in-progress {
+    border-left: 5px solid #ffc107; /* Amarillo de Bootstrap */
+}
+
+.card.status-completed {
+    border-left: 5px solid green;
+}
