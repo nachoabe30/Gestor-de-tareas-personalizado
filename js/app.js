@@ -27,18 +27,37 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Contador para el número de tareas
     let taskCounter = 0;
-    
-    // Función para crear una nueva tarea (card)
-    function createTaskCard(title, description, creationTime) {
-        taskCounter++;
-        
+
+    // Array para almacenar los datos de las tareas
+    let tasks = [];
+
+    // Función para guardar las tareas en localStorage
+    function saveTasksToLocalStorage() {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    // Función para cargar las tareas desde localStorage
+    function loadTasksFromLocalStorage() {
+        const storedTasks = JSON.parse(localStorage.getItem('tasks'));
+        if (storedTasks) {
+            tasks = storedTasks;
+            taskCounter = tasks.length;
+            tasks.forEach(task => createTaskCard(task.title, task.description, task.creationTime, task.status));
+        }
+    }
+
+    // Función para crear una nueva tarea (card) en el DOM
+    function createTaskCard(title, description, creationTime, status = 'not-started') {
         const cardCol = document.createElement('div');
         cardCol.className = 'col-sm-12 col-md-6 col-lg-4 mb-3';
 
+        const taskIndex = tasks.findIndex(t => t.title === title && t.description === description && t.creationTime === creationTime);
+        cardCol.setAttribute('data-task-index', taskIndex);
+
         cardCol.innerHTML = `
-            <div class="card border-0 rounded-3 shadow status-not-started" data-status="not-started">
+            <div class="card border-0 rounded-3 shadow status-${status}" data-status="${status}">
                 <div class="card-body bg-white rounded-3 position-relative">
-                    <span class="badge bg-dark position-absolute top-0 start-0 m-2">#${taskCounter}</span>
+                    <span class="badge bg-dark position-absolute top-0 start-0 m-2">#${taskIndex + 1}</span>
                     <small class="text-muted position-absolute bottom-0 end-0 m-2">${creationTime}</small>
                     
                     <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 delete-btn">
@@ -76,6 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         const creationTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
         
+        const newTask = {
+            title,
+            description,
+            creationTime,
+            status: 'not-started'
+        };
+
+        tasks.push(newTask);
+        saveTasksToLocalStorage();
         createTaskCard(title, description, creationTime);
         
         taskForm.reset();
@@ -130,9 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Lógica para el cambio de estado de los botones del modal
     function updateStatusButtons(status) {
-        // Remover clases activas de todos los botones
         statusButtonsContainer.querySelectorAll('button').forEach(btn => {
-            btn.classList.remove('active', 'btn-outline-danger', 'btn-danger', 'btn-outline-warning', 'btn-warning', 'btn-outline-success', 'btn-success');
+            btn.classList.remove('active', 'btn-danger', 'btn-warning', 'btn-success');
             
             // Reaplicar la clase de outline a todos los botones
             if (btn.getAttribute('data-status') === 'not-started') {
@@ -144,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // Añadir la clase 'active' al botón seleccionado y remover la clase de outline
         const selectedButton = statusButtonsContainer.querySelector(`[data-status="${status}"]`);
         if (selectedButton) {
             selectedButton.classList.remove(`btn-outline-${selectedButton.getAttribute('data-status')}`);
@@ -157,6 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentTaskCard) {
             const selectedButton = statusButtonsContainer.querySelector('.active');
             const newStatus = selectedButton ? selectedButton.getAttribute('data-status') : 'not-started';
+
+            const taskIndex = currentTaskCard.parentElement.getAttribute('data-task-index');
+            tasks[taskIndex].status = newStatus;
+            saveTasksToLocalStorage();
 
             currentTaskCard.classList.remove('status-not-started', 'status-in-progress', 'status-completed');
             currentTaskCard.classList.add(`status-${newStatus}`);
@@ -173,7 +203,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const newTitle = editTaskTitleInput.value;
             const newDescription = editTaskDescriptionInput.value;
             
-            // La variable currentTaskCard ya es la tarjeta principal
+            const taskIndex = currentTaskCard.parentElement.getAttribute('data-task-index');
+            tasks[taskIndex].title = newTitle;
+            tasks[taskIndex].description = newDescription;
+            saveTasksToLocalStorage();
+
             currentTaskCard.querySelector('.card-title').textContent = newTitle;
             currentTaskCard.querySelector('.card-text').textContent = newDescription;
 
@@ -182,4 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.hide();
         }
     });
+
+    // Cargar las tareas al iniciar la página
+    loadTasksFromLocalStorage();
 });
