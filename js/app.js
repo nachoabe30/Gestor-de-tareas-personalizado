@@ -155,18 +155,39 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStatusButtons(cardStatus);
         }
 
-        // LÓGICA DE BORRADO
+        // LÓGICA DE BORRADO: Modal de confirmación con SweetAlert2
         if (target.closest('.delete-btn')) {
             const cardCol = target.closest('.col-sm-12');
             const taskIndex = parseInt(cardCol.getAttribute('data-task-index'));
             
-            // Eliminar la tarea del array y del DOM
-            if (!isNaN(taskIndex)) {
-                tasks.splice(taskIndex, 1);
-                saveTasksToLocalStorage();
-                cardCol.remove();
-                updateCardNumbers();
-            }
+            // Muestra el modal de confirmación de SweetAlert2
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: '¡Esta acción no se puede revertir!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, borrar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, procede con el borrado
+                    if (!isNaN(taskIndex)) {
+                        tasks.splice(taskIndex, 1);
+                        saveTasksToLocalStorage();
+                        cardCol.remove();
+                        updateCardNumbers();
+                    }
+
+                    // Muestra un mensaje de éxito
+                    Swal.fire(
+                        '¡Borrado!',
+                        'La tarea ha sido eliminada.',
+                        'success'
+                    );
+                }
+            });
         }
     });
 
