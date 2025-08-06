@@ -19,13 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewTaskTitle = document.getElementById('viewTaskTitle');
     const viewTaskDescription = document.getElementById('viewTaskDescription');
     const viewTaskTime = document.getElementById('viewTaskTime');
-    const viewTaskNumber = document.getElementById('viewTaskNumber');
-    const statusNotStartedBtn = document.getElementById('status-not-started');
-    const statusInProgressBtn = document.getElementById('status-in-progress');
-    const statusCompletedBtn = document.getElementById('status-completed');
+    const statusButtonsContainer = document.getElementById('status-buttons');
+    const saveStatusBtn = document.getElementById('saveStatusBtn');
 
-
-    // Variable global para almacenar la card que se está editando
+    // Variable global para almacenar la card que se está editando o viendo
     let currentTaskCard = null;
     
     // Contador para el número de tareas
@@ -39,12 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
         cardCol.className = 'col-sm-12 col-md-6 col-lg-4 mb-3';
 
         cardCol.innerHTML = `
-            <div class="card border-0 rounded-3 shadow">
+            <div class="card border-0 rounded-3 shadow status-not-started" data-status="not-started">
                 <div class="card-body bg-white rounded-3 position-relative">
                     <span class="badge bg-dark position-absolute top-0 start-0 m-2">#${taskCounter}</span>
                     <small class="text-muted position-absolute bottom-0 end-0 m-2">${creationTime}</small>
                     
-                    <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2">
+                    <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 delete-btn">
                         <i class="bi bi-x-lg"></i>
                     </button>
                     
@@ -66,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         taskList.prepend(cardCol);
     }
     
-    // Escuchar el evento 'click' del botón de guardar
+    // Escuchar el evento 'click' del botón de guardar tarea nueva
     saveTaskBtn.addEventListener('click', () => {
         const title = taskTitleInput.value;
         const description = taskDescriptionInput.value;
@@ -93,66 +90,80 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Lógica para editar
         if (target.closest('.edit-btn')) {
-            currentTaskCard = target.closest('.card-body');
-            const title = currentTaskCard.querySelector('.card-title').textContent;
-            const description = currentTaskCard.querySelector('.card-text').textContent;
+            const cardBody = target.closest('.card-body');
+            currentTaskCard = cardBody.parentElement; // Guarda la referencia de la card principal
+            
+            const title = cardBody.querySelector('.card-title').textContent;
+            const description = cardBody.querySelector('.card-text').textContent;
             editTaskTitleInput.value = title;
             editTaskDescriptionInput.value = description;
         }
 
-        // LÓGICA DE VISUALIZACIÓN: Lógica para ver detalles de la tarea
+        // Lógica para ver detalles
         if (target.closest('.view-btn')) {
             const cardBody = target.closest('.card-body');
+            currentTaskCard = cardBody.parentElement; // Guarda la referencia de la card principal
+            
             const title = cardBody.querySelector('.card-title').textContent;
             const description = cardBody.querySelector('.card-text').textContent;
             const time = cardBody.querySelector('.text-muted').textContent;
             
-            // Rellenar el modal de detalles con los datos
             viewTaskTitle.textContent = title;
             viewTaskDescription.textContent = description;
             viewTaskTime.textContent = time;
 
-            // Obtener el estado actual de la card
-            const cardStatus = cardBody.getAttribute('data-status') || 'not-started';
+            // Obtener el estado actual de la card y actualizar los botones del modal
+            const cardStatus = currentTaskCard.getAttribute('data-status') || 'not-started';
             updateStatusButtons(cardStatus);
         }
     });
 
-    // Lógica para el cambio de estado de los botones
+    // Manejar el clic en los botones de estado dentro del modal
+    statusButtonsContainer.addEventListener('click', (event) => {
+        const target = event.target;
+        const status = target.getAttribute('data-status');
+
+        if (status) {
+            updateStatusButtons(status);
+        }
+    });
+
+    // Lógica para el cambio de estado de los botones del modal
     function updateStatusButtons(status) {
         // Remover clases activas de todos los botones
-        statusNotStartedBtn.classList.remove('active');
-        statusInProgressBtn.classList.remove('active');
-        statusCompletedBtn.classList.remove('active');
+        statusButtonsContainer.querySelectorAll('button').forEach(btn => {
+            btn.classList.remove('active', 'btn-outline-danger', 'btn-danger', 'btn-outline-warning', 'btn-warning', 'btn-outline-success', 'btn-success');
+            
+            // Reaplicar la clase de outline a todos los botones
+            if (btn.getAttribute('data-status') === 'not-started') {
+                btn.classList.add('btn-outline-danger');
+            } else if (btn.getAttribute('data-status') === 'in-progress') {
+                btn.classList.add('btn-outline-warning');
+            } else if (btn.getAttribute('data-status') === 'completed') {
+                btn.classList.add('btn-outline-success');
+            }
+        });
         
-        // Añadir la clase 'active' al botón seleccionado
-        if (status === 'not-started') {
-            statusNotStartedBtn.classList.add('active');
-        } else if (status === 'in-progress') {
-            statusInProgressBtn.classList.add('active');
-        } else if (status === 'completed') {
-            statusCompletedBtn.classList.add('active');
+        // Añadir la clase 'active' al botón seleccionado y remover la clase de outline
+        const selectedButton = statusButtonsContainer.querySelector(`[data-status="${status}"]`);
+        if (selectedButton) {
+            selectedButton.classList.remove(`btn-outline-${selectedButton.getAttribute('data-status')}`);
+            selectedButton.classList.add('active', `btn-${selectedButton.getAttribute('data-status')}`);
         }
     }
 
-    // Lógica para guardar el estado de la tarea cuando se hace clic en los botones
-    viewTaskModal.addEventListener('click', (event) => {
-        const target = event.target;
-        let newStatus = '';
-        
-        if (target.id === 'status-not-started') {
-            newStatus = 'not-started';
-        } else if (target.id === 'status-in-progress') {
-            newStatus = 'in-progress';
-        } else if (target.id === 'status-completed') {
-            newStatus = 'completed';
-        }
+    // Manejar el clic en el botón "Guardar" del modal de estado
+    saveStatusBtn.addEventListener('click', () => {
+        if (currentTaskCard) {
+            const selectedButton = statusButtonsContainer.querySelector('.active');
+            const newStatus = selectedButton ? selectedButton.getAttribute('data-status') : 'not-started';
 
-        if (newStatus) {
-            updateStatusButtons(newStatus);
-            // Aquí podrías agregar lógica para actualizar el estilo de la card principal
-            // Por ejemplo: currentTaskCard.setAttribute('data-status', newStatus);
-            // y luego en CSS, cambiar el color del borde.
+            currentTaskCard.classList.remove('status-not-started', 'status-in-progress', 'status-completed');
+            currentTaskCard.classList.add(`status-${newStatus}`);
+            currentTaskCard.setAttribute('data-status', newStatus);
+
+            const modal = bootstrap.Modal.getInstance(viewTaskModal);
+            modal.hide();
         }
     });
 
@@ -162,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newTitle = editTaskTitleInput.value;
             const newDescription = editTaskDescriptionInput.value;
             
+            // La variable currentTaskCard ya es la tarjeta principal
             currentTaskCard.querySelector('.card-title').textContent = newTitle;
             currentTaskCard.querySelector('.card-text').textContent = newDescription;
 

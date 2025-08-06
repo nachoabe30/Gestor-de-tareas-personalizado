@@ -1,12 +1,19 @@
-/* Colores de estado de la tarjeta */
-.card.status-not-started {
-    border-left: 5px solid red;
+/* Colores más intensos para la card según estado */
+
+.status-not-started .card-body {
+  background-color: #f8d7da; /* rojo claro */
+  border-left: 8px solid #dc3545;
+  box-shadow: 0 0 8px rgba(220, 53, 69, 0.4);
 }
 
-.card.status-in-progress {
-    border-left: 5px solid #ffc107; /* Amarillo de Bootstrap */
+.status-in-progress .card-body {
+  background-color: #fff3cd; /* amarillo */
+  border-left: 8px solid #ffc107;
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.4);
 }
 
-.card.status-completed {
-    border-left: 5px solid green;
+.status-completed .card-body {
+  background-color: #d1e7dd; /* verde claro */
+  border-left: 8px solid #28a745;
+  box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
 }
