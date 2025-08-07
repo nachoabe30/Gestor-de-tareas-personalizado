@@ -31,96 +31,96 @@
     <main class="container mt-4">
         <section>
             <div class="text-start">
-                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#taskModal">
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalTarea">
                     <i class="bi bi-plus-lg"></i> Crear tu Tarea
                 </button>
             </div>
         </section>
 
-        <section id="taskContainer" class="container mt-4 p-3">
-            <div class="row" id="taskList">
-                </div>
+        <section id="contenedorTareas" class="container mt-4 p-3">
+            <div class="row" id="listaTareas">
+            </div>
         </section>
     </main>
 
-    <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modalTarea" tabindex="-1" aria-labelledby="etiquetaModalTarea" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="taskModalLabel">Crear Tu Nueva Tarea <i class="bi bi-pencil-fill"></i></h5>
+                    <h5 class="modal-title" id="etiquetaModalTarea">Crear Tu Nueva Tarea <i class="bi bi-pencil-fill"></i></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="taskForm">
+                    <form id="formularioTarea">
                         <div class="mb-3">
-                            <label for="taskTitle" class="form-label">Título de Tarea</label>
-                            <input type="text" class="form-control" id="taskTitle">
+                            <label for="tituloTarea" class="form-label">Título de Tarea</label>
+                            <input type="text" class="form-control" id="tituloTarea">
                         </div>
                         <div class="mb-3">
-                            <label for="taskDescription" class="form-label">Descripción de Tarea</label>
-                            <textarea class="form-control" id="taskDescription" rows="3"></textarea>
+                            <label for="descripcionTarea" class="form-label">Descripción de Tarea</label>
+                            <textarea class="form-control" id="descripcionTarea" rows="3"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-warning" id="saveTaskBtn">Guardar</button>
+                    <button type="button" class="btn btn-warning" id="botonGuardarTarea">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modalEditarTarea" tabindex="-1" aria-labelledby="etiquetaModalEditarTarea" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editTaskModalLabel">Editar Tarea <i class="bi bi-pencil-square"></i></h5>
+                    <h5 class="modal-title" id="etiquetaModalEditarTarea">Editar Tarea <i class="bi bi-pencil-square"></i></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editTaskForm">
+                    <form id="formularioEditarTarea">
                         <div class="mb-3">
-                            <label for="editTaskTitle" class="form-label">Título de Tarea</label>
-                            <input type="text" class="form-control" id="editTaskTitle">
+                            <label for="editarTituloTarea" class="form-label">Título de Tarea</label>
+                            <input type="text" class="form-control" id="editarTituloTarea">
                         </div>
                         <div class="mb-3">
-                            <label for="editTaskDescription" class="form-label">Descripción de Tarea</label>
-                            <textarea class="form-control" id="editTaskDescription" rows="3"></textarea>
+                            <label for="editarDescripcionTarea" class="form-label">Descripción de Tarea</label>
+                            <textarea class="form-control" id="editarDescripcionTarea" rows="3"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-warning" id="saveChangesBtn">Guardar Cambios</button>
+                    <button type="button" class="btn btn-warning" id="botonGuardarCambios">Guardar Cambios</button>
                 </div>
             </div>
         </div>
     </div>
     
-<div class="modal fade" id="viewTaskModal" tabindex="-1" aria-labelledby="viewTaskModalLabel" aria-hidden="true">
+<div class="modal fade" id="modalVerTarea" tabindex="-1" aria-labelledby="etiquetaModalVerTarea" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="viewTaskModalLabel">Detalles de la Tarea</h5>
+                <h5 class="modal-title" id="etiquetaModalVerTarea">Detalles de la Tarea</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                <h4 id="viewTaskTitle"></h4>
-                <p id="viewTaskDescription"></p>
+                <h4 id="verTituloTarea"></h4>
+                <p id="verDescripcionTarea"></p>
                 <div class="d-flex justify-content-end">
-                    <p class="mb-0 text-muted" id="viewTaskTime"></p>
+                    <p class="mb-0 text-muted" id="verTiempoTarea"></p>
                 </div>
                 <hr>
                 <h6>Estado de la Tarea:</h6>
-                <div class="btn-group w-100" role="group" aria-label="Task status" id="status-buttons">
-                    <button type="button" class="btn btn-outline-danger" data-status="not-started">No empezada</button>
-                    <button type="button" class="btn btn-outline-warning" data-status="in-progress">En proceso</button>
-                    <button type="button" class="btn btn-outline-success" data-status="completed">Realizada</button>
+                <div class="btn-group w-100" role="group" aria-label="Estado de la Tarea" id="botonesEstado">
+                    <button type="button" class="btn btn-outline-danger" data-status="no-empezada">No empezada</button>
+                    <button type="button" class="btn btn-outline-warning" data-status="en-progreso">En proceso</button>
+                    <button type="button" class="btn btn-outline-success" data-status="realizada">Realizada</button>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-warning" id="saveStatusBtn">Guardar</button>
+                <button type="button" class="btn btn-warning" id="botonGuardarEstado">Guardar</button>
             </div>
         </div>
     </div>

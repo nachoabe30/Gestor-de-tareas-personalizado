@@ -2,70 +2,71 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // Obtener todos los elementos del DOM por su ID
-    const taskForm = document.getElementById('taskForm');
-    const taskList = document.getElementById('taskList');
-    const taskTitleInput = document.getElementById('taskTitle');
-    const taskDescriptionInput = document.getElementById('taskDescription');
-    const saveTaskBtn = document.getElementById('saveTaskBtn');
+    const formularioTarea = document.getElementById('formularioTarea');
+    const listaTareas = document.getElementById('listaTareas');
+    const tituloTareaInput = document.getElementById('tituloTarea');
+    const descripcionTareaInput = document.getElementById('descripcionTarea');
+    const botonGuardarTarea = document.getElementById('botonGuardarTarea');
     
     // Elementos del modal de edición
-    const editTaskModal = document.getElementById('editTaskModal');
-    const editTaskTitleInput = document.getElementById('editTaskTitle');
-    const editTaskDescriptionInput = document.getElementById('editTaskDescription');
-    const saveChangesBtn = document.getElementById('saveChangesBtn');
+    const modalEditarTarea = document.getElementById('modalEditarTarea');
+    const editarTituloTareaInput = document.getElementById('editarTituloTarea');
+    const editarDescripcionTareaInput = document.getElementById('editarDescripcionTarea');
+    const botonGuardarCambios = document.getElementById('botonGuardarCambios');
     
     // Elementos del modal de vista detallada
-    const viewTaskModal = document.getElementById('viewTaskModal');
-    const viewTaskTitle = document.getElementById('viewTaskTitle');
-    const viewTaskDescription = document.getElementById('viewTaskDescription');
-    const viewTaskTime = document.getElementById('viewTaskTime');
-    const statusButtonsContainer = document.getElementById('status-buttons');
-    const saveStatusBtn = document.getElementById('saveStatusBtn');
+    const modalVerTarea = document.getElementById('modalVerTarea');
+    const verTituloTarea = document.getElementById('verTituloTarea');
+    const verDescripcionTarea = document.getElementById('verDescripcionTarea');
+    const verTiempoTarea = document.getElementById('verTiempoTarea');
+    const botonesEstado = document.getElementById('botonesEstado');
+    const botonGuardarEstado = document.getElementById('botonGuardarEstado');
 
     // Variable global para almacenar la card que se está editando o viendo
-    let currentTaskCard = null;
+    let tarjetaTareaActual = null;
 
     // Array para almacenar los datos de las tareas
-    let tasks = [];
+    let tareas = [];
 
     // Función para guardar las tareas en localStorage
-    function saveTasksToLocalStorage() {
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+    function guardarTareasEnLocalStorage() {
+        localStorage.setItem('tasks', JSON.stringify(tareas));
     }
 
     // Función para cargar las tareas desde localStorage
-    function loadTasksFromLocalStorage() {
-        const storedTasks = JSON.parse(localStorage.getItem('tasks'));
-        if (storedTasks) {
-            tasks = storedTasks;
-            tasks.forEach((task, index) => createTaskCard(task.title, task.description, task.creationTime, task.status, index));
+    function cargarTareasDesdeLocalStorage() {
+        const tareasAlmacenadas = JSON.parse(localStorage.getItem('tasks'));
+        if (tareasAlmacenadas) {
+            tareas = tareasAlmacenadas;
+            tareas.forEach((tarea, indice) => crearTarjetaTarea(tarea.title, tarea.description, tarea.creationTime, tarea.status, indice));
         }
     }
 
     // Función para crear una nueva tarea (card) en el DOM
-    function createTaskCard(title, description, creationTime, status = 'not-started', index) {
-        const cardCol = document.createElement('div');
-        cardCol.className = 'col-sm-12 col-md-6 col-lg-4 mb-3';
-        cardCol.setAttribute('data-task-index', index);
+    function crearTarjetaTarea(titulo, descripcion, tiempoCreacion, estado = 'no-empezada', indice) {
+        const columnaTarjeta = document.createElement('div');
+        columnaTarjeta.className = 'col-sm-12 col-md-6 col-lg-4 mb-3';
+        columnaTarjeta.setAttribute('data-task-index', indice);
 
-        cardCol.innerHTML = `
-            <div class="card border-0 rounded-3 shadow status-${status}" data-status="${status}">
+        // Se usa la nueva clase 'estado-'
+        columnaTarjeta.innerHTML = `
+            <div class="card border-0 rounded-3 shadow estado-${estado}" data-status="${estado}">
                 <div class="card-body bg-white rounded-3 position-relative">
-                    <span class="badge bg-dark position-absolute top-0 start-0 m-2">#${index + 1}</span>
-                    <small class="text-muted position-absolute bottom-0 end-0 m-2">${creationTime}</small>
+                    <span class="badge bg-dark position-absolute top-0 start-0 m-2">#${indice + 1}</span>
+                    <small class="text-muted position-absolute bottom-0 end-0 m-2">${tiempoCreacion}</small>
                     
-                    <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 delete-btn">
+                    <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 boton-borrar">
                         <i class="bi bi-x-lg"></i>
                     </button>
                     
-                    <h5 class="card-title mt-4">${title}</h5>
-                    <p class="card-text">${description}</p>
+                    <h5 class="card-title mt-4">${titulo}</h5>
+                    <p class="card-text">${descripcion}</p>
                     
                     <div class="d-flex gap-2 mt-3">
-                        <button type="button" class="btn btn-dark btn-sm rounded-circle d-flex align-items-center justify-content-center view-btn" data-bs-toggle="modal" data-bs-target="#viewTaskModal" style="width: 32px; height: 32px;">
+                        <button type="button" class="btn btn-dark btn-sm rounded-circle d-flex align-items-center justify-content-center boton-ver" data-bs-toggle="modal" data-bs-target="#modalVerTarea" style="width: 32px; height: 32px;">
                             <i class="bi bi-chevron-right"></i>
                         </button>
-                        <button type="button" class="btn btn-warning btn-sm rounded-circle d-flex align-items-center justify-content-center edit-btn" data-bs-toggle="modal" data-bs-target="#editTaskModal" style="width: 32px; height: 32px;">
+                        <button type="button" class="btn btn-warning btn-sm rounded-circle d-flex align-items-center justify-content-center boton-editar" data-bs-toggle="modal" data-bs-target="#modalEditarTarea" style="width: 32px; height: 32px;">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
                     </div>
@@ -73,92 +74,92 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         
-        taskList.prepend(cardCol);
+        listaTareas.prepend(columnaTarjeta);
     }
     
     // Función para actualizar los números de las tarjetas
-    function updateCardNumbers() {
-        const cards = document.querySelectorAll('#taskList .col-sm-12');
-        cards.forEach((card, index) => {
-            card.setAttribute('data-task-index', index);
-            const cardBody = card.querySelector('.card-body');
-            const badge = cardBody.querySelector('.badge');
-            if (badge) {
-                badge.textContent = `#${index + 1}`;
+    function actualizarNumerosTarjetas() {
+        const tarjetas = document.querySelectorAll('#listaTareas .col-sm-12');
+        tarjetas.forEach((tarjeta, indice) => {
+            tarjeta.setAttribute('data-task-index', indice);
+            const cuerpoTarjeta = tarjeta.querySelector('.card-body');
+            const insignia = cuerpoTarjeta.querySelector('.badge');
+            if (insignia) {
+                insignia.textContent = `#${indice + 1}`;
             }
         });
     }
 
     // Escuchar el evento 'click' del botón de guardar tarea nueva
-    saveTaskBtn.addEventListener('click', () => {
-        const title = taskTitleInput.value;
-        const description = taskDescriptionInput.value;
+    botonGuardarTarea.addEventListener('click', () => {
+        const titulo = tituloTareaInput.value;
+        const descripcion = descripcionTareaInput.value;
         
-        if (title.trim() === '' || description.trim() === '') {
+        if (titulo.trim() === '' || descripcion.trim() === '') {
             alert('Por favor, completa todos los campos.');
             return;
         }
         
-        const now = new Date();
-        const creationTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const ahora = new Date();
+        const tiempoCreacion = `${ahora.getHours()}:${String(ahora.getMinutes()).padStart(2, '0')}`;
         
-        const newTask = {
-            title,
-            description,
-            creationTime,
-            status: 'not-started'
+        const nuevaTarea = {
+            title: titulo,
+            description: descripcion,
+            creationTime: tiempoCreacion,
+            status: 'no-empezada'
         };
 
-        tasks.unshift(newTask); // Usar unshift para agregar al principio
-        saveTasksToLocalStorage();
+        tareas.unshift(nuevaTarea); // Usar unshift para agregar al principio
+        guardarTareasEnLocalStorage();
         
         // Limpiar el DOM y volver a renderizar para actualizar los índices
-        taskList.innerHTML = '';
-        tasks.forEach((task, index) => createTaskCard(task.title, task.description, task.creationTime, task.status, index));
+        listaTareas.innerHTML = '';
+        tareas.forEach((tarea, indice) => crearTarjetaTarea(tarea.title, tarea.description, tarea.creationTime, tarea.status, indice));
         
-        taskForm.reset();
+        formularioTarea.reset();
         
-        const taskModal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
-        taskModal.hide();
+        const modalTarea = bootstrap.Modal.getInstance(document.getElementById('modalTarea'));
+        modalTarea.hide();
     });
 
     // Manejar el clic en los botones de las tarjetas (delegación de eventos)
-    taskList.addEventListener('click', (event) => {
-        const target = event.target;
+    listaTareas.addEventListener('click', (event) => {
+        const objetivo = event.target;
 
         // Lógica para editar
-        if (target.closest('.edit-btn')) {
-            const cardBody = target.closest('.card-body');
-            currentTaskCard = cardBody.parentElement; // Guarda la referencia de la card principal
+        if (objetivo.closest('.boton-editar')) {
+            const cuerpoTarjeta = objetivo.closest('.card-body');
+            tarjetaTareaActual = cuerpoTarjeta.parentElement; // Guarda la referencia de la card principal
             
-            const title = cardBody.querySelector('.card-title').textContent;
-            const description = cardBody.querySelector('.card-text').textContent;
-            editTaskTitleInput.value = title;
-            editTaskDescriptionInput.value = description;
+            const titulo = cuerpoTarjeta.querySelector('.card-title').textContent;
+            const descripcion = cuerpoTarjeta.querySelector('.card-text').textContent;
+            editarTituloTareaInput.value = titulo;
+            editarDescripcionTareaInput.value = descripcion;
         }
 
         // Lógica para ver detalles
-        if (target.closest('.view-btn')) {
-            const cardBody = target.closest('.card-body');
-            currentTaskCard = cardBody.parentElement; // Guarda la referencia de la card principal
+        if (objetivo.closest('.boton-ver')) {
+            const cuerpoTarjeta = objetivo.closest('.card-body');
+            tarjetaTareaActual = cuerpoTarjeta.parentElement; // Guarda la referencia de la card principal
             
-            const title = cardBody.querySelector('.card-title').textContent;
-            const description = cardBody.querySelector('.card-text').textContent;
-            const time = cardBody.querySelector('.text-muted').textContent;
+            const titulo = cuerpoTarjeta.querySelector('.card-title').textContent;
+            const descripcion = cuerpoTarjeta.querySelector('.card-text').textContent;
+            const tiempo = cuerpoTarjeta.querySelector('.text-muted').textContent;
             
-            viewTaskTitle.textContent = title;
-            viewTaskDescription.textContent = description;
-            viewTaskTime.textContent = time;
+            verTituloTarea.textContent = titulo;
+            verDescripcionTarea.textContent = descripcion;
+            verTiempoTarea.textContent = tiempo;
 
             // Obtener el estado actual de la card y actualizar los botones del modal
-            const cardStatus = currentTaskCard.getAttribute('data-status') || 'not-started';
-            updateStatusButtons(cardStatus);
+            const estadoTarjeta = tarjetaTareaActual.getAttribute('data-status') || 'no-empezada';
+            actualizarBotonesEstado(estadoTarjeta);
         }
 
         // LÓGICA DE BORRADO: Modal de confirmación con SweetAlert2
-        if (target.closest('.delete-btn')) {
-            const cardCol = target.closest('.col-sm-12');
-            const taskIndex = parseInt(cardCol.getAttribute('data-task-index'));
+        if (objetivo.closest('.boton-borrar')) {
+            const columnaTarjeta = objetivo.closest('.col-sm-12');
+            const indiceTarea = parseInt(columnaTarjeta.getAttribute('data-task-index'));
             
             // Muestra el modal de confirmación de SweetAlert2
             Swal.fire({
@@ -173,11 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Si el usuario confirma, procede con el borrado
-                    if (!isNaN(taskIndex)) {
-                        tasks.splice(taskIndex, 1);
-                        saveTasksToLocalStorage();
-                        cardCol.remove();
-                        updateCardNumbers();
+                    if (!isNaN(indiceTarea)) {
+                        tareas.splice(indiceTarea, 1);
+                        guardarTareasEnLocalStorage();
+                        columnaTarjeta.remove();
+                        actualizarNumerosTarjetas();
                     }
 
                     // Muestra un mensaje de éxito
@@ -192,79 +193,80 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Manejar el clic en los botones de estado dentro del modal
-    statusButtonsContainer.addEventListener('click', (event) => {
-        const target = event.target;
-        const status = target.getAttribute('data-status');
+    botonesEstado.addEventListener('click', (event) => {
+        const objetivo = event.target;
+        const estado = objetivo.getAttribute('data-status');
 
-        if (status) {
-            updateStatusButtons(status);
+        if (estado) {
+            actualizarBotonesEstado(estado);
         }
     });
 
     // Lógica para el cambio de estado de los botones del modal
-    function updateStatusButtons(status) {
-        statusButtonsContainer.querySelectorAll('button').forEach(btn => {
+    function actualizarBotonesEstado(estado) {
+        botonesEstado.querySelectorAll('button').forEach(btn => {
             btn.classList.remove('active', 'btn-danger', 'btn-warning', 'btn-success');
             
-            if (btn.getAttribute('data-status') === 'not-started') {
+            if (btn.getAttribute('data-status') === 'no-empezada') {
                 btn.classList.add('btn-outline-danger');
-            } else if (btn.getAttribute('data-status') === 'in-progress') {
+            } else if (btn.getAttribute('data-status') === 'en-progreso') {
                 btn.classList.add('btn-outline-warning');
-            } else if (btn.getAttribute('data-status') === 'completed') {
+            } else if (btn.getAttribute('data-status') === 'realizada') {
                 btn.classList.add('btn-outline-success');
             }
         });
         
-        const selectedButton = statusButtonsContainer.querySelector(`[data-status="${status}"]`);
-        if (selectedButton) {
-            selectedButton.classList.remove(`btn-outline-${selectedButton.getAttribute('data-status')}`);
-            selectedButton.classList.add('active', `btn-${selectedButton.getAttribute('data-status')}`);
+        const botonSeleccionado = botonesEstado.querySelector(`[data-status="${estado}"]`);
+        if (botonSeleccionado) {
+            botonSeleccionado.classList.remove(`btn-outline-${botonSeleccionado.getAttribute('data-status').replace('no-empezada', 'danger').replace('en-progreso', 'warning').replace('realizada', 'success')}`);
+            botonSeleccionado.classList.add('active', `btn-${estado.replace('no-empezada', 'danger').replace('en-progreso', 'warning').replace('realizada', 'success')}`);
         }
     }
 
     // Manejar el clic en el botón "Guardar" del modal de estado
-    saveStatusBtn.addEventListener('click', () => {
-        if (currentTaskCard) {
-            const selectedButton = statusButtonsContainer.querySelector('.active');
-            const newStatus = selectedButton ? selectedButton.getAttribute('data-status') : 'not-started';
+    botonGuardarEstado.addEventListener('click', () => {
+        if (tarjetaTareaActual) {
+            const botonSeleccionado = botonesEstado.querySelector('.active');
+            const nuevoEstado = botonSeleccionado ? botonSeleccionado.getAttribute('data-status') : 'no-empezada';
 
-            const taskIndex = parseInt(currentTaskCard.parentElement.getAttribute('data-task-index'));
-            if (!isNaN(taskIndex) && tasks[taskIndex]) {
-                tasks[taskIndex].status = newStatus;
-                saveTasksToLocalStorage();
+            const indiceTarea = parseInt(tarjetaTareaActual.parentElement.getAttribute('data-task-index'));
+            if (!isNaN(indiceTarea) && tareas[indiceTarea]) {
+                tareas[indiceTarea].status = nuevoEstado;
+                guardarTareasEnLocalStorage();
             }
+            
+            // Se actualiza la clase de la tarjeta con el nuevo estado
+            tarjetaTareaActual.classList.remove('estado-no-empezada', 'estado-en-progreso', 'estado-realizada');
+            tarjetaTareaActual.classList.add(`estado-${nuevoEstado}`);
+            tarjetaTareaActual.setAttribute('data-status', nuevoEstado);
 
-            currentTaskCard.classList.remove('status-not-started', 'status-in-progress', 'status-completed');
-            currentTaskCard.classList.add(`status-${newStatus}`);
-            currentTaskCard.setAttribute('data-status', newStatus);
-
-            const modal = bootstrap.Modal.getInstance(viewTaskModal);
+            const modal = bootstrap.Modal.getInstance(modalVerTarea);
             modal.hide();
         }
     });
 
     // Manejar el clic en el botón "Guardar Cambios" del modal de edición
-    saveChangesBtn.addEventListener('click', () => {
-        if (currentTaskCard) {
-            const newTitle = editTaskTitleInput.value;
-            const newDescription = editTaskDescriptionInput.value;
+    botonGuardarCambios.addEventListener('click', () => {
+        if (tarjetaTareaActual) {
+            const nuevoTitulo = editarTituloTareaInput.value;
+            const nuevaDescripcion = editarDescripcionTareaInput.value;
             
-            const taskIndex = parseInt(currentTaskCard.parentElement.getAttribute('data-task-index'));
-            if (!isNaN(taskIndex) && tasks[taskIndex]) {
-                tasks[taskIndex].title = newTitle;
-                tasks[taskIndex].description = newDescription;
-                saveTasksToLocalStorage();
+            const indiceTarea = parseInt(tarjetaTareaActual.parentElement.getAttribute('data-task-index'));
+            if (!isNaN(indiceTarea) && tareas[indiceTarea]) {
+                tareas[indiceTarea].title = nuevoTitulo;
+                tareas[indiceTarea].description = nuevaDescripcion;
+                guardarTareasEnLocalStorage();
             }
 
-            currentTaskCard.querySelector('.card-title').textContent = newTitle;
-            currentTaskCard.querySelector('.card-text').textContent = newDescription;
+            tarjetaTareaActual.querySelector('.card-title').textContent = nuevoTitulo;
+            tarjetaTareaActual.querySelector('.card-text').textContent = nuevaDescripcion;
 
-            currentTaskCard = null;
-            const modal = bootstrap.Modal.getInstance(editTaskModal);
+            tarjetaTareaActual = null;
+            const modal = bootstrap.Modal.getInstance(modalEditarTarea);
             modal.hide();
         }
     });
 
     // Cargar las tareas al iniciar la página
-    loadTasksFromLocalStorage();
+    cargarTareasDesdeLocalStorage();
 });

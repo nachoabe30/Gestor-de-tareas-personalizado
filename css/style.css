@@ -1,19 +1,17 @@
-/* Colores más intensos para la card según estado */
-
-.status-not-started .card-body {
-  background-color: #f8d7da; /* rojo claro */
-  border-left: 8px solid #dc3545;
-  box-shadow: 0 0 8px rgba(220, 53, 69, 0.4);
+.estado-no-empezada .card-body {
+    background-color: #f8d7da; /* rojo claro */
+    border-left: 8px solid #dc3545;
+    box-shadow: 0 0 8px rgba(220, 53, 69, 0.4);
 }
 
-.status-in-progress .card-body {
-  background-color: #fff3cd; /* amarillo */
-  border-left: 8px solid #ffc107;
-  box-shadow: 0 0 8px rgba(255, 193, 7, 0.4);
+.estado-en-progreso .card-body {
+    background-color: #fff3cd; /* amarillo */
+    border-left: 8px solid #ffc107;
+    box-shadow: 0 0 8px rgba(255, 193, 7, 0.4);
 }
 
-.status-completed .card-body {
-  background-color: #d1e7dd; /* verde claro */
-  border-left: 8px solid #28a745;
-  box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+.estado-realizada .card-body {
+    background-color: #d1e7dd; /* verde claro */
+    border-left: 8px solid #28a745;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
 }
